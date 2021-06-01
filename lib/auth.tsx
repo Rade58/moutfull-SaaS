@@ -5,6 +5,7 @@ import React, {
   createContext,
   FC,
 } from "react";
+import { useRouter } from "next/router";
 
 import firebase from "./firebase";
 
@@ -20,6 +21,7 @@ export interface AuthDataI {
   user: UserCherryPickedI | null;
   isLoading: boolean;
   signInWithGitHub: () => void;
+  signInWithGoogle: (redirect: any) => void;
   signOut: () => void;
 }
 
@@ -29,6 +31,8 @@ const useProvideAuth = () => {
   // SAMO SLUZI ZA REQUEST, NEMOJ DA DEFINISES true
   // U SLUCAJU DA NISI GETT-OVAO USERA
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const { push: routerPush } = useRouter();
 
   const formatUser = (rawUser: any): UserCherryPickedI => {
     return {
@@ -53,6 +57,8 @@ const useProvideAuth = () => {
     }
   };
 
+  // GITHUB oAuth
+
   const signInWithGitHub = () => {
     setIsLoading(true);
 
@@ -63,6 +69,24 @@ const useProvideAuth = () => {
         handleUser(response.user);
       });
   };
+
+  // GOOGLE oAuth
+  const signInWithGoogle = (redirect: any) => {
+    setIsLoading(true);
+
+    return firebase
+      .auth()
+      .signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then((response) => {
+        handleUser(response.user);
+
+        if (redirect) {
+          routerPush(redirect);
+        }
+      });
+  };
+
+  // SIGNOUT
 
   const signOut = () => {
     return firebase
@@ -90,6 +114,7 @@ const useProvideAuth = () => {
     user,
     isLoading,
     signInWithGitHub,
+    signInWithGoogle,
     signOut,
   };
 };
@@ -99,6 +124,7 @@ const defaultAuthData = {
   user: null,
   isLoading: true,
   signInWithGitHub: () => {},
+  signInWithGoogle: (redirect: any) => {},
   signOut: () => {},
 };
 

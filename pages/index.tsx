@@ -4,7 +4,8 @@ import { FunctionComponent } from "react";
 import { useAuth } from "../lib/auth";
 
 const IndexPage: FunctionComponent = () => {
-  const { user, signInWithGitHub, signOut, isLoading } = useAuth();
+  const { user, signInWithGitHub, signInWithGoogle, signOut, isLoading } =
+    useAuth();
 
   return user ? (
     <div>
@@ -12,7 +13,10 @@ const IndexPage: FunctionComponent = () => {
       <button onClick={() => signOut()}>Sign Out</button>
     </div>
   ) : (
-    <button onClick={() => signInWithGitHub()}>Sign In</button>
+    <>
+      <button onClick={() => signInWithGitHub()}>Sign In With GitHub</button>
+      <button onClick={() => signInWithGoogle}>Sign In With Google</button>
+    </>
   );
 };
 
