@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+    // IMAMO TRI KOLEKCIJE: users, fedback, sites
+
+    // ZA users KOLEKCIJU DOZVOLJEN JE read AND write
+    // AKO JE USER SIGNED I AKO JE U PITANJU USER
+    // KOJI OWN-UJE TAJ user OBJEKAT
+    match /users/{uid} {
+      allow read, write: if isUser(uid)
+    }
+
+    // ZA feedback KOLEKCIJU
+    // SVAAKO MOZE DA JE CITA
+    match /feedback/{uid} {
+      allow read: if true;
+      allow create: if willBeOwner();
+      allow delete: if isOwner() || isSiteOwner();
+      allow update: if isOwner() && willBeOwner() || isSiteOwner() && willBeSiteOwner();
+    }
+
+    // ZA sites KOLEKCIJU
+    match /sites/{uid} {
+      allow read: if isOwner();
+      allow create: if willBeOwner();
+      allow delete: if isOwner();
+      allow update: if isOwner() && willBeOwner();
+    }
+
+  }
+
+}
+
+// ZA BOLJE RAZUMEVANJA SVEGA
+// https://fireship.io/snippets/firestore-rules-recipes/
+
+// **************** HELPERS ****************
+//
+// ---------- auth HELPERS -----------------------
+function isSignedIn(){
+  return request.auth.uid != null;
+}
+
+function isUser(uid){
+  return isSignedIn() && request.auth.uid == uid;
+}
+// ------------------------------------------------
+
+// ------DATA HELPERS -----------------------------------------------
+function currentData() { // DATA ALREADY IN DATABASE
+  return resource.data;
+}
+
+function incommingData(){ // DATA TO BE OR NOT BE PUTTED IN DOCUMENT
+  return request.resource.data
+}
+// ------------------------------------------------------------------
+
+// *******************************************************
+// IS USER OWNING THE DOCUMENT (IS HE CREATED THE DOCUMENT)
+function isOwner(){
+  return isUser(currentData().authorId)
+}
+//
+// IS USER OWNING CERTAIN DOCUMENT FROM sites COLLECTION
+// (IS HE CREATED THE site DOCUMENT)
+function isSiteOwner(){
+  return isUser(currentData().siteAuthorId);
+}
+// ------------------------------------------------------
+// HELPERS FOR DOCUMENT CREATION
+function willBeOwner(){
+  return isUser(incommingData().authorId)
+}
+// HELPER FOR DOCUMENT UPDATE
+function willBeSiteOwner(){
+  return isUser(incommingData().siteAuthorId)
+}
+// ------------------------------------------------------
