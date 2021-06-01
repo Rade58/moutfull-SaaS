@@ -9,6 +9,8 @@ import { useRouter } from "next/router";
 
 import firebase from "./firebase";
 
+import { createUser } from "./db";
+
 export interface UserCherryPickedI {
   uid: string;
   email: string;
@@ -47,6 +49,7 @@ const useProvideAuth = () => {
   const handleUser = (rawUser?: any): UserCherryPickedI | false => {
     if (rawUser) {
       const user = formatUser(rawUser);
+      createUser(user.uid, user);
       setUser(user);
       setIsLoading(false);
       return user;
