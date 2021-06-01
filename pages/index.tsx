@@ -15,7 +15,9 @@ const IndexPage: FunctionComponent = () => {
   ) : (
     <>
       <button onClick={() => signInWithGitHub()}>Sign In With GitHub</button>
-      <button onClick={() => signInWithGoogle}>Sign In With Google</button>
+      <button onClick={() => signInWithGoogle(undefined)}>
+        Sign In With Google
+      </button>
     </>
   );
 };
