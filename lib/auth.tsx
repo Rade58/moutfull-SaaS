@@ -8,25 +8,109 @@ import React, {
 
 import firebase from "./firebase";
 
-export interface AuthDataI {
-  user: any | null;
-  signinWithGitHub: (() => void) | null;
-  signout: (() => void) | null;
+export interface UserCherryPickedI {
+  uid: string;
+  email: string;
+  name: string;
+  provider: string;
+  photoUrl: string;
 }
 
-// FUNKCIJA
-const useProvideAuth = () => {
-  const [user, setUser] = useState<AuthDataI["user"]>(null);
-};
+export interface AuthDataI {
+  user: UserCherryPickedI | null;
+  isLoading: boolean;
+  signInWithGitHub: () => void;
+  signOut: () => void;
+}
 
-const defaultAuthData = { user: null, signinWithGitHub: null, signout: null };
+// -----------------------------------------------------
+const useProvideAuth = () => {
+  const [user, setUser] = useState<AuthDataI["user"] | null>(null);
+  // SAMO SLUZI ZA REQUEST, NEMOJ DA DEFINISES true
+  // U SLUCAJU DA NISI GETT-OVAO USERA
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const formatUser = (rawUser: any): UserCherryPickedI => {
+    return {
+      uid: rawUser.uid,
+      email: rawUser.email,
+      name: rawUser.displayName,
+      photoUrl: rawUser.photoURL,
+      provider: rawUser.providerData[0].providerId,
+    };
+  };
+
+  const handleUser = (rawUser?: any): UserCherryPickedI | false => {
+    if (rawUser) {
+      const user = formatUser(rawUser);
+      setUser(user);
+      setIsLoading(false);
+      return user;
+    } else {
+      setUser(null);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  const signInWithGitHub = () => {
+    setIsLoading(true);
+
+    return firebase
+      .auth()
+      .signInWithPopup(new firebase.auth.GithubAuthProvider())
+      .then((response) => {
+        handleUser(response.user);
+      });
+  };
+
+  const signOut = () => {
+    return firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        handleUser(undefined); // EKSPLICITAN SAM SAMO DA BI UKAPIRAO STA RADIM
+        // MADA NISAM MORAO DA PROSLEDJUJEM undefined
+      });
+  };
+
+  // CLEANUP (OVDE PRI UNMOUNTINGU PROVIDE-UJEM
+  // FUNKCIJU KOJA CE BITI IZVRSENA, A KOJA CE SET-OVATI USERA OPET NA null)
+
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(handleUser);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // HOOK CE DA RETURN-UJE
+  return {
+    user,
+    isLoading,
+    signInWithGitHub,
+    signOut,
+  };
+};
+// -----------------------------------------------------
+
+const defaultAuthData = {
+  user: null,
+  isLoading: true,
+  signInWithGitHub: () => {},
+  signOut: () => {},
+};
 
 const authContext = createContext<AuthDataI>(defaultAuthData);
 
 const { Provider } = authContext;
 
 export const AuthProvider: FC = ({ children }) => {
-  return <Provider value={defaultAuthData}>{children}</Provider>;
+  // HOOK KORISTIMO U OVOJ KOMPOONENTI
+  const authData = useProvideAuth();
+
+  return <Provider value={authData}>{children}</Provider>;
 };
 
 export const useAuth = () => {
