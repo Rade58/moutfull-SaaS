@@ -21,7 +21,7 @@ export interface AuthDataI {
   user: UserCherryPickedI | null;
   isLoading: boolean;
   signInWithGitHub: () => void;
-  signInWithGoogle: (redirect: any) => void;
+  signInWithGoogle: (redirect?: string) => void;
   signOut: () => void;
 }
 
@@ -124,7 +124,7 @@ const defaultAuthData = {
   user: null,
   isLoading: true,
   signInWithGitHub: () => {},
-  signInWithGoogle: (redirect: any) => {},
+  signInWithGoogle: (redirect?: string) => {},
   signOut: () => {},
 };
 
