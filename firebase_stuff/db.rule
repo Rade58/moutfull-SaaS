@@ -7,13 +7,19 @@ service cloud.firestore {
 
     // ZA users KOLEKCIJU DOZVOLJEN JE read AND write
     // AKO JE USER SIGNED I AKO JE U PITANJU USER
-    // KOJI OWN-UJE TAJ user OBJEKAT
+    // KOJI IMA ODGOVARAJUCI uid
+    // A update I delete NISU DOZVOLJENI
     match /users/{uid} {
       allow read, write: if isUser(uid)
     }
 
     // ZA feedback KOLEKCIJU
     // SVAAKO MOZE DA JE CITA
+    // DA JE CREAT-UJE MOZE SAMO USER
+    // KOJI JE TRNUTNO SIGNED I KOJI JE REGISTERED
+    // DA DELET-UJE DOKUMENT MOZE SAMO OWNER DOKUMENTA
+    // ALI I KOJI JE OWNER site DOKUMENTA, SA KOJIM JE POVEZAN feedback
+    // DA UPDATE-UJE MOZE SAMO OWNER site DOKUMENTA
     match /feedback/{uid} {
       allow read: if true;
       allow create: if willBeOwner();
@@ -22,6 +28,7 @@ service cloud.firestore {
     }
 
     // ZA sites KOLEKCIJU
+    // EVDE SU STVARI NESSTO MORE SIMPLE
     match /sites/{uid} {
       allow read: if isOwner();
       allow create: if willBeOwner();
