@@ -1,6 +1,6 @@
 /* eslint react/react-in-jsx-scope: 0 */
 /* eslint jsx-a11y/anchor-is-valid: 1 */
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, SyntheticEvent } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { useRef, useState } from "react";
 import { useRouter } from "next/router";
@@ -17,7 +17,7 @@ import { useAuth } from "@/lib/auth";
 import Feedback from "@/components/Feedback";
 
 interface FeedbackPagePropsI {
-  initialFeedback?: FeedbackNormalizedDataI[];
+  initialFeedback?: FeedbackDataI[];
 }
 
 type paramsType = { siteId: string };
@@ -30,14 +30,19 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
   const { user } = useAuth();
   const { query } = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [allFeedback, setAllFeedback] = useState<FeedbackDataI[]>();
+  const [allFeedback, setAllFeedback] =
+    useState<FeedbackDataI[] | undefined>(initialFeedback);
 
-  const submitFeedback = () => {
+  console.log({ query });
+
+  const submitFeedback = (e: SyntheticEvent) => {
+    e.preventDefault();
+
     if (!user) return;
     if (!inputRef.current) return;
     if (!inputRef.current.value) return;
 
-    createFeedback({
+    const newFeedback = {
       author: user.name,
       authorId: user.uid,
       createdAt: new Date().toISOString(),
@@ -45,6 +50,19 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
       siteId: query.siteId as string,
       text: inputRef.current.value.trim(),
       status: "pending",
+    };
+
+    createFeedback(newFeedback).then((doc) => {
+      console.log({ doc });
+
+      if (inputRef.current?.value) {
+        inputRef.current.value = "";
+      }
+
+      setAllFeedback((prevFeedback) => {
+        if (!prevFeedback) return [newFeedback];
+        return [...prevFeedback, newFeedback];
+      });
     });
   };
 
@@ -68,11 +86,14 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
           </FormControl>
         </Box>
       )}
-      {initialFeedback &&
-        initialFeedback.map(({ id, author, createdAt, text }) => {
+      {allFeedback &&
+        allFeedback.map(({ author, createdAt, text }, i) => {
           return (
             <Feedback
-              key={id || new Date().getTime().toString()}
+              key={
+                `${i}${createdAt.toLocaleLowerCase()}` ||
+                new Date().getTime().toString()
+              }
               author={author}
               createdAt={createdAt}
               text={text}
