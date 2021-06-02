@@ -1,7 +1,7 @@
 /* eslint react/react-in-jsx-scope: 0 */
 /* eslint jsx-a11y/anchor-is-valid: 1 */
 import { FunctionComponent } from "react";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "@/lib/auth";
 
 const IndexPage: FunctionComponent = () => {
   const { user, signInWithGitHub, signInWithGoogle, signOut, isLoading } =

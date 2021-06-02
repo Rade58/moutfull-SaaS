@@ -42,9 +42,21 @@
     "browser": true,
     "node": true
   },
+  "ignorePatterns": ["node_modules/", ".next/"],
   "settings": {
     "react": {
       "version": "detect"
+    },
+    "import/resolver": {
+      "alias": {
+        "map": [
+          ["@/components", "./components"],
+          ["@/lib", "./lib"],
+          ["@/styles", "./styles"],
+          ["@/util", "./util"]
+        ],
+        "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
+      }
     }
   }
 }
