@@ -2,13 +2,15 @@
 /* eslint jsx-a11y/anchor-is-valid: 1 */
 import type { FunctionComponent } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/router";
 
 import { Box, FormControl, FormLabel, Input, Button } from "@chakra-ui/react";
 
+import { createFeedback } from "@/lib/db";
+
 import { getAllSites, getAllFeedback } from "@/lib/db-admin";
-import type { FeedbackNormalizedDataI } from "@/lib/db-admin";
+import type { FeedbackNormalizedDataI, FeedbackDataI } from "@/lib/db-admin";
 
 import { useAuth } from "@/lib/auth";
 
@@ -26,8 +28,25 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
   initialFeedback,
 }) => {
   const { user } = useAuth();
-
+  const { query } = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [allFeedback, setAllFeedback] = useState<FeedbackDataI[]>();
+
+  const submitFeedback = () => {
+    if (!user) return;
+    if (!inputRef.current) return;
+    if (!inputRef.current.value) return;
+
+    createFeedback({
+      author: user.name,
+      authorId: user.uid,
+      createdAt: new Date().toISOString(),
+      provider: user.provider,
+      siteId: query.siteId as string,
+      text: inputRef.current.value.trim(),
+      status: "pending",
+    });
+  };
 
   return (
     <Box
@@ -39,7 +58,7 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
       border="1px solid crimson"
     >
       {user && (
-        <Box as="form">
+        <Box as="form" onSubmit={submitFeedback}>
           <FormControl my={8}>
             <FormLabel htmlFor="comment">Comment</FormLabel>
             <Input ref={inputRef} id="comment" placeholder="Leave a comment" />
@@ -53,7 +72,7 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
         initialFeedback.map(({ id, author, createdAt, text }) => {
           return (
             <Feedback
-              key={id}
+              key={id || new Date().getTime().toString()}
               author={author}
               createdAt={createdAt}
               text={text}

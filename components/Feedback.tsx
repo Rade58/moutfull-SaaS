@@ -6,7 +6,13 @@ import { format, parseISO } from "date-fns";
 
 import { FeedbackDataI } from "@/lib/db-admin";
 
-const Feedback: FunctionComponent<FeedbackDataI> = ({
+interface FeedbackPropsI {
+  author: FeedbackDataI["author"];
+  text: FeedbackDataI["text"];
+  createdAt: FeedbackDataI["createdAt"];
+}
+
+const Feedback: FunctionComponent<FeedbackPropsI> = ({
   author,
   text,
   createdAt,

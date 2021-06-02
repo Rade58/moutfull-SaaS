@@ -2,8 +2,12 @@ import db from "@/lib/firebase-admin";
 
 export interface FeedbackDataI {
   author: string;
+  authorId: string;
+  siteId: string;
   text: string;
   createdAt: string;
+  provider: string;
+  status: string;
 }
 
 export interface FeedbackDocI {

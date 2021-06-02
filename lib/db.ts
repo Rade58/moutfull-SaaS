@@ -1,4 +1,5 @@
 import firebase from "@/lib/firebase";
+import type { FeedbackDataI } from "@/lib/db-admin";
 
 const firestore = firebase.firestore();
 
@@ -15,6 +16,6 @@ export const createUser = (uid: string, data: any) => {
 
 // CREATE FEEDBACK
 
-export const createFeedback = (data: any) => {
+export const createFeedback = (data: FeedbackDataI) => {
   return firestore.collection("feedback").add(data);
 };
