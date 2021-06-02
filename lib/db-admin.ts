@@ -1,6 +1,6 @@
 import db from "./firebase-admin";
 
-export async function getAllFeedback(siteId: string) {
+export async function getAllFeedback(siteId?: string) {
   try {
     const snapshot = await db
       .collection("feedback")
@@ -17,4 +17,16 @@ export async function getAllFeedback(siteId: string) {
   } catch (error) {
     return { error };
   }
+}
+
+export async function getAllSites() {
+  const snapshot = await db.collection("sites").get();
+
+  const sites: any[] = [];
+
+  snapshot.forEach((doc) => {
+    sites.push({ id: doc.id, ...doc.data() });
+  });
+
+  return { sites };
 }
