@@ -1,5 +1,20 @@
 import db from "@/lib/firebase-admin";
 
+export interface FeedbackDataI {
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface FeedbackDocI {
+  id: string;
+  data: () => FeedbackDataI;
+}
+
+export interface FeedbackNormalizedDataI extends FeedbackDataI {
+  id: FeedbackDocI["id"];
+}
+
 export async function getAllFeedback(siteId?: string) {
   try {
     const snapshot = await db
@@ -7,10 +22,17 @@ export async function getAllFeedback(siteId?: string) {
       .where("siteId", "==", siteId)
       .get();
 
-    const feedback: any[] = [];
+    const feedback: FeedbackNormalizedDataI[] = [];
 
     snapshot.forEach((doc) => {
-      feedback.push({ id: doc.id, ...doc.data() });
+      const { id, data: d } = doc;
+
+      const data = d() as FeedbackDataI;
+
+      feedback.push({
+        id,
+        ...data,
+      });
     });
 
     return { feedback };

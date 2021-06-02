@@ -8,11 +8,14 @@ import { useRouter } from "next/router";
 import { Box, FormControl, FormLabel, Input, Button } from "@chakra-ui/react";
 
 import { getAllSites, getAllFeedback } from "@/lib/db-admin";
+import type { FeedbackNormalizedDataI } from "@/lib/db-admin";
 
 import { useAuth } from "@/lib/auth";
 
+import Feedback from "@/components/Feedback";
+
 interface FeedbackPagePropsI {
-  initialFeedback: any;
+  initialFeedback?: FeedbackNormalizedDataI[];
 }
 
 type paramsType = { siteId: string };
@@ -22,10 +25,6 @@ type paramsType = { siteId: string };
 const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
   initialFeedback,
 }) => {
-  console.log({ initialFeedback });
-
-  // const { query } = useRouter();
-
   const { user } = useAuth();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +49,17 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
           </FormControl>
         </Box>
       )}
+      {initialFeedback &&
+        initialFeedback.map(({ id, author, createdAt, text }) => {
+          return (
+            <Feedback
+              key={id}
+              author={author}
+              createdAt={createdAt}
+              text={text}
+            />
+          );
+        })}
     </Box>
   );
 };
