@@ -12,3 +12,9 @@ export const createUser = (uid: string, data: any) => {
     .doc(uid)
     .set({ uid, ...data }, { merge: true });
 };
+
+// CREATE FEEDBACK
+
+export const createFeedback = (data: any) => {
+  return firestore.collection("feedback").add(data);
+};
