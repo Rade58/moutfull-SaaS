@@ -13,7 +13,7 @@ MADA MOZES DA SAZNAS I [SA ZVANICNE DOCS STRANICE](https://swr.vercel.app/#focus
 
 ## KREIRACEMO PRVO `fetcher` FUNKCIJU, KOJA TREBA DA PARSE-UJE DATA IZ RESPONSE-A; ALI ONA CE MORATI DA KORISTI `window.fetch`
 
-- `mkdi utils`
+- `mkdir utils`
 
 - `touch utils/fetcher.ts`
 
