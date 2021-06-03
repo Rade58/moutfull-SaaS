@@ -10,13 +10,29 @@ export interface FeedbackDataI {
   status: string;
 }
 
+export interface SiteDataI {
+  url: string;
+  name: string;
+  userId: string;
+  createdAt: string;
+}
+
 export interface FeedbackDocI {
   id: string;
   data: () => FeedbackDataI;
 }
 
+export interface SiteDocI {
+  id: string;
+  data: () => SiteDataI;
+}
+
 export interface FeedbackNormalizedDataI extends FeedbackDataI {
   id: FeedbackDocI["id"];
+}
+
+export interface SiteNormalizedDataI extends SiteDataI {
+  id: SiteDocI["id"];
 }
 
 export async function getAllFeedback(siteId?: string) {
@@ -48,11 +64,18 @@ export async function getAllFeedback(siteId?: string) {
 export async function getAllSites() {
   const snapshot = await db.collection("sites").get();
 
-  const sites: any[] = [];
+  try {
+    const sites: SiteNormalizedDataI[] = [];
+    snapshot.forEach((doc) => {
+      const { id, data: d } = doc;
 
-  snapshot.forEach((doc) => {
-    sites.push({ id: doc.id, ...doc.data() });
-  });
+      const data = d() as SiteDataI;
 
-  return { sites };
+      sites.push({ id, ...data });
+    });
+
+    return { sites };
+  } catch (error) {
+    return { error };
+  }
 }
