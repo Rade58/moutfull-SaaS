@@ -40,3 +40,5 @@ EVO VIDI
 // data CE BITI ONO STO RETURN-UJE FETCHER
 const {data, error} = useSWR("/api/some_route", fetcher)
 ```
+
+# KORISTICEMO `useSwr` NA NOVOM PAGE-U `pages/sites.tsx`

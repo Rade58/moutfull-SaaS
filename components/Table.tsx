@@ -2,8 +2,9 @@
 import React from "react";
 import type { FC } from "react";
 import { Box, Text } from "@chakra-ui/react";
+import type { TextProps, BoxProps } from "@chakra-ui/react";
 
-export const Th: FC = ({ children }) => {
+export const Th: FC<TextProps> = (props) => {
   return (
     <Text
       as="th"
@@ -12,13 +13,12 @@ export const Th: FC = ({ children }) => {
       color="gray.500"
       fontWeight="medium"
       px={4}
-    >
-      {children}
-    </Text>
+      {...props}
+    />
   );
 };
 
-export const Td: FC = ({ children }) => {
+export const Td: FC<BoxProps> = (props) => {
   return (
     <Box
       as="td"
@@ -26,13 +26,12 @@ export const Td: FC = ({ children }) => {
       p={4}
       borderBottom="1px solid"
       borderBottomColor="gray.100"
-    >
-      {children}
-    </Box>
+      {...props}
+    />
   );
 };
 
-export const Tr: FC = ({ children }) => {
+export const Tr: FC<BoxProps> = (props) => {
   return (
     <Box
       as="tr"
@@ -42,13 +41,12 @@ export const Tr: FC = ({ children }) => {
       borderBottom="1px solid"
       borderBottomColor="gray.200"
       height="40px"
-    >
-      {children}
-    </Box>
+      {...props}
+    />
   );
 };
 
-export const Table: FC = ({ children }) => {
+export const Table: FC<BoxProps> = (props) => {
   return (
     <Box
       as="table"
@@ -57,8 +55,7 @@ export const Table: FC = ({ children }) => {
       mx={0}
       borderRadius={8}
       boxShadow="0px 4px 10px rgba(0,0,0,0.08)"
-    >
-      {children}
-    </Box>
+      {...props}
+    />
   );
 };
