@@ -21,6 +21,9 @@ MADA MOZES DA SAZNAS I [SA ZVANICNE DOCS STRANICE](https://swr.vercel.app/#focus
 export default async function (url: RequestInfo, init?: RequestInit) {
   // OVDE SAM MOGAO KORISTITI I axios UMESTO fetch
 
+  // A OVO ZNACI DA BI TI ISTO PROSLEDJIVAO I BODY I HEADERS
+  // UPRAVO OVDE
+
   const res = await fetch(url, init);
 
   // json FUNKCIJA PARSE-UJE JSON STRING INTO VALID JAVASCRIPT
