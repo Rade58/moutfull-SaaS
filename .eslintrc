@@ -53,7 +53,7 @@
           ["@/components", "./components"],
           ["@/lib", "./lib"],
           ["@/styles", "./styles"],
-          ["@/util", "./util"]
+          ["@/utils", "./utils"]
         ],
         "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
       }
