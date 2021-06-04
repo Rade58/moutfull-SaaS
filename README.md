@@ -42,3 +42,7 @@ const {data, error} = useSWR("/api/some_route", fetcher)
 ```
 
 # KORISTICEMO `useSwr` NA NOVOM PAGE-U `pages/sites.tsx`
+
+```tsx
+
+```

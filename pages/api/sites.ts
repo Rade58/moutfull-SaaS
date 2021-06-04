@@ -19,6 +19,4 @@ export default async (
   }
 
   res.status(200).json({ sites: result.sites });
-
-  res.status(200).json({ sites: result.sites });
 };
