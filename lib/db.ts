@@ -22,7 +22,7 @@ export const createFeedback = (data: FeedbackDataI) => {
 
 // SAVE SITE
 
-export function createSite(data: any) {
+export function createSite(data: { name: string; url: string }) {
   const site = firestore.collection("sites").doc();
   site.set(data);
 

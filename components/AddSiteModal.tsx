@@ -2,6 +2,9 @@
 import React from "react";
 import type { FC } from "react";
 
+// TREBAC MI POMENUTI mutate
+import { mutate } from "swr";
+
 import { useForm } from "react-hook-form";
 import {
   Modal,
@@ -15,12 +18,26 @@ import {
   FormLabel,
   Button,
   Input,
-  // KORISTI SE ZA STATE MODALA
+  // KORISTI SE ZA STATE MODALA (LAKSI JE HANDLING STATE-A)
   useDisclosure,
+
+  //
+  useToast,
 } from "@chakra-ui/react";
 
+import { useAuth } from "@/lib/auth";
+
+import { createSite } from "@/lib/db";
+
 const AddSiteModal: FC = ({ children }) => {
+  const { user } = useAuth();
+
+  // STATE MODALA
+  // FUNKCIJE onClose I onOpen USTVARI PODESVAJU isOpen
+  // TO BE true OR false
   const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const toast = useToast();
 
   // OVO IZGLEDA DA DAJE FUNCTIONALITY OUT OF THE BOX
   // handlesubmit je ZA ONO STA I GOVORI
@@ -28,6 +45,52 @@ const AddSiteModal: FC = ({ children }) => {
   // A register JE ZA REFERENCU FORM CONTROLE
   // ODNON OZA MULTIPLE CONTROLA
   const { register, handleSubmit } = useForm();
+
+  const onCreateSite = (params: { name: string; url: string }) => {
+    if (!user) return;
+
+    const { name, url } = params;
+
+    const newSite = {
+      authorId: user.uid,
+      createdAt: new Date().toISOString(),
+      name,
+      url,
+    };
+
+    // OVDE JE NAPRAVLJEN NETWORK REQUEST
+    const { id } = createSite(newSite);
+    // UNDER THE HOOD OVA FUNKCIJA NE AWAIT-UJE DA SE NETWORK REQUEST
+    // IZVRSI, ONA SALJE DATA, SA KOJIMA SE PRAVI NOVI SITE
+
+    toast({
+      title: "Success!",
+      description: "We've added your site.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+
+    // OVDE NECE BITI NAPRAVLJEN NOVI NETWORK REQUEST
+    // KORISTIM OVDE mutate, KAKO BI RAKO SVIM
+    // useSwr-OVIMA, KOJI KORISTE KLJUC:
+    //                ["/api/sites",  "user-ov jwt token"]
+    // DRUGI ARGUMENT mutate-A JE FUNKCIJA, KOJOM CEMO MUTATE-OVATI CACHE
+    mutate(
+      ["/api/sites", user.token],
+      async (oldCachedData: { sites: any[] }) => {
+        // OBICNO DATA RESPONSE, JE U FORMATU {sites: ...}
+        return {
+          sites: [{ id, ...newSite }, ...oldCachedData.sites],
+        };
+      },
+      // REVALIDATIO NCE BITI false
+      false
+    );
+
+    // GOVORIM ODA SE MODAL ZATVORI
+    onClose();
+  };
 
   return (
     <>
@@ -43,7 +106,8 @@ const AddSiteModal: FC = ({ children }) => {
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent as="form" onSubmit={handleSubmit(TODO)}>
+        {/* OVDE POZIVAMO onCreateSite */}
+        <ModalContent as="form" onSubmit={handleSubmit(onCreateSite)}>
           <ModalHeader fontWeight="bold">Add Site</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
