@@ -16,15 +16,38 @@ import { DeleteIcon } from "@chakra-ui/icons";
 
 import { deleteFeedback } from "@/lib/db";
 
+import { useAuth } from "@/lib/auth";
+
 const DeleteFeedbackButton: FC<{ feedbackId: string }> = ({ feedbackId }) => {
-  const [isOpen, setIsopen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  const onClose = () => setIsopen(false);
+  const onClose = () => setIsOpen(false);
+
+  const { user } = useAuth();
 
   const onDelete = () => {
+    if (!user) return;
+
     deleteFeedback(feedbackId);
+
+    // OVO NE ZNAM ZASTO JE OVDE S OBZIROM DA FEEDBACKS NISU CACHED
+    // OVO TI GOVORIM, JER U FEEDBACK LOADED KAO PROPS
+    // INSIDE getStaticProps
+    mutate(
+      // TAKODJE ROUTE /api/feedback TRENUTNO NE POSTOJI
+      ["/api/feedback", user.token],
+      async function (cachedFeedbacks: any[]) {
+        return {
+          feedback: cachedFeedbacks.filter((feedback) => {
+            return feedback.id !== feedbackId;
+          }),
+        };
+      },
+      false
+    );
+
     onClose();
   };
 
@@ -34,7 +57,7 @@ const DeleteFeedbackButton: FC<{ feedbackId: string }> = ({ feedbackId }) => {
         aria-label="Delete feedback"
         icon={<DeleteIcon />}
         variant="ghost"
-        onClick={() => setIsopen(true)}
+        onClick={() => setIsOpen(true)}
       />
       <AlertDialog
         isOpen={isOpen}
