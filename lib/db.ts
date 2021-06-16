@@ -28,3 +28,14 @@ export function createSite(data: { name: string; url: string }) {
 
   return site;
 }
+
+// DELETE FEEDBACK
+
+export function deleteFeedback(id: string) {
+  return firestore.collection("feedback").doc(id).delete();
+}
+
+// DELETE SITE
+export function deleteSite(id: string) {
+  return firestore.collection("sites").doc(id).delete();
+}
