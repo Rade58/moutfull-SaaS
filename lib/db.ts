@@ -19,3 +19,12 @@ export const createUser = (uid: string, data: any) => {
 export const createFeedback = (data: FeedbackDataI) => {
   return firestore.collection("feedback").add(data);
 };
+
+// SAVE SITE
+
+export function createSite(data: any) {
+  const site = firestore.collection("sites").doc();
+  site.set(data);
+
+  return site;
+}
