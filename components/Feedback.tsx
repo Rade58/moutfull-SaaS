@@ -7,6 +7,7 @@ import { format, parseISO } from "date-fns";
 import { FeedbackDataI } from "@/lib/db-admin";
 
 // import DeleteFeedbackButton from "@/components/DeleteFeedbackButton";
+// import FeedbckRow from './FeedbackRow'
 
 interface FeedbackPropsI {
   id: string;
@@ -31,6 +32,7 @@ const Feedback: FunctionComponent<FeedbackPropsI> = ({
       </Text>
       <Text color="gray.800">{text}</Text>
       {/* <DeleteFeedbackButton feedbackId={id} /> */}
+      {/* <FeedbckRow id={id} author={author} text={text}  /> */}
       <Divider
         borderColor="gray.200"
         backgroundColor="gray.200"
