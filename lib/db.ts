@@ -41,3 +41,8 @@ export function deleteFeedback(id: string) {
 export function deleteSite(id: string) {
   return firestore.collection("sites").doc(id).delete();
 }
+
+// UPDATE FEEDBACK
+export function updateFeedback(id: string, newValues: any) {
+  return firestore.collection("feedback").doc(id).update(newValues);
+}
