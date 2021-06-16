@@ -1,4 +1,4 @@
-import db from "@/lib/firebase-admin";
+import { db } from "@/lib/firebase-admin";
 
 export interface FeedbackDataI {
   author: string;
@@ -79,3 +79,6 @@ export async function getAllSites() {
     return { error };
   }
 }
+
+// SITES FOR ONLY ONE USER
+export async function getUserSites(uid: string) {}
