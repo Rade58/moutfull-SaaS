@@ -81,3 +81,90 @@ const Dashboard: FC = () => {
 
 export default Dashboard;
 ```
+
+# MEDJUTIM, PRVI ARGUMENT `useSwr` USTVARI JESU ARGUMENT, KOJI SE PROSLEDJUJU FETCH-ERU
+
+POKAZACU TI TOO NA PRIMERU, KAKO BI TI BILO JASNIJE
+
+POSTO CEMO MI KORISTITI `xa` SA USER OBJECT-A, A TO BI TREBALO DA JE JSON WEB TOKEN, POKAZACU TI KAKO MOZEMO PROSLEDITI ARGUGUMENTS IN ARRAY
+
+PRVO DA MODIFIKUJEMO FETCH-ERA DA ON UZIMA U OBZIR, USTVARI TAJ TOKEN
+
+- `code utils/fetcher.ts`
+
+```ts
+// TOKEN CE BITI DRUGI ARGUMENT fetcher-A
+
+export default async function fetcher(url: RequestInfo, token: string) {
+  // POSLACEMO CUSTOM HEADER, KOJ ICE SE ZVATI token
+
+  const headers = new Headers({ "Content-Type": "application/json", token });
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers,
+    credentials: "same-origin",
+  });
+
+  return res.json();
+}
+```
+
+**SADA MOZEMO NA SLEDECI NACIN DA KORISTIMO, `fetcher`-A, SA `useSWR`**
+
+- `code pages/sites.tsx`
+
+```tsx
+/* eslint jsx-a11y/anchor-is-valid: 1 */
+import React from "react";
+import type { FC } from "react";
+import type { SitesApiDataType } from "./api/sites";
+// EVO UVEZAO SAM GA
+import useSWR from "swr";
+
+import DasboardShell from "@/components/DashboardShell";
+import EmptyState from "@/components/EmptyState";
+import SiteTableSkeleton from "@/components/SiteTableSkeleton";
+import SiteTable from "@/components/SiteTable";
+
+import fetcher from "@/utils/fetcher";
+
+// POSTO MOZEMO UZETI user OBJECT IZ useAuth HOOK-A, NJEGA SMO UVEZLI
+import { useAuth } from "@/lib/auth";
+
+const Dashboard: FC = () => {
+  // UZIMAMO user-A
+  const { user } = useAuth();
+
+  // OVDE, PRVI ARGUMENT JE ARRAY fetcher-OVIH ARGUMENATA (ODNONO
+  // ARGUMENATA NAMENJENIH fetcher FUNKCIJI, KOJA JE ONA, KOAJ ACTUALY SALJE REQUEST)
+  // I OVOG PUTA token JE U ARGUMENTS ARRAY, PORED URL-A
+  const { data } = useSWR<SitesApiDataType>(
+    user ? ["/api/sites", user.xa] : null,
+    fetcher
+  );
+
+  // NEKA TE NE BUNI GORNJI TERNARY, UPOTREBIO
+  // SAM GA ZA SLUCAJ DA NEMA user OBJECT-A
+  // U TOM SLUCAJU REQUEST NECE BITI NI POSLAT
+
+  const sites = data?.sites;
+
+  if (!data || !sites) {
+    return (
+      <DasboardShell>
+        <SiteTableSkeleton />
+      </DasboardShell>
+    );
+  }
+
+  return (
+    <DasboardShell>
+      {sites.length ? <SiteTable sites={sites} /> : <EmptyState />}
+    </DasboardShell>
+  );
+};
+
+export default Dashboard;
+```
+

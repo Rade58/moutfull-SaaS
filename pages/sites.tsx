@@ -12,9 +12,24 @@ import SiteTable from "@/components/SiteTable";
 
 import fetcher from "@/utils/fetcher";
 
+// POSTO MOZEMO UZETI user OBJECT IZ useAuth HOOK-A, NJEGA SMO UVEZLI
+import { useAuth } from "@/lib/auth";
+
 const Dashboard: FC = () => {
-  // CAK SAM DODAO I TYPESCRIPT TYPE O TOME KAKO TREBA DA IZGLEDA DATA
-  const { data } = useSWR<SitesApiDataType>("/api/sites", fetcher);
+  // UZIMAMO user-A
+  const { user } = useAuth();
+
+  // OVDE, PRVI ARGUMENT JE ARRAY fetcher-OVIH ARGUMENATA (ODNONO
+  // ARGUMENATA NAMENJENIH fetcher FUNKCIJI, KOJA JE ONA, KOAJ ACTUALY SALJE REQUEST)
+  // I OVOG PUTA token JE U ARGUMENTS ARRAY, PORED URL-A
+  const { data } = useSWR<SitesApiDataType>(
+    user ? ["/api/sites", user.xa] : null,
+    fetcher
+  );
+
+  // NEKA TE NE BUNI GORNJI TERNARY, UPOTREBIO
+  // SAM GA ZA SLUCAJ DA NEMA user OBJECT-A
+  // U TOM SLUCAJU REQUEST NECE BITI NI POSLAT
 
   const sites = data?.sites;
 

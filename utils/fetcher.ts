@@ -1,8 +1,15 @@
-export default async function (url: RequestInfo, init?: RequestInit) {
-  // OVDE SAM MOGAO KORISTITI I axios UMESTO fetch
+// TOKEN CE BITI DRUGI ARGUMENT fetcher-A
 
-  const res = await fetch(url, init);
+export default async function fetcher(url: RequestInfo, token: string) {
+  // POSLACEMO CUSTOM HEADER, KOJ ICE SE ZVATI token
 
-  // json FUNKCIJA PARSE-UJE JSON STRING INTO VALID JAVASCRIPT
+  const headers = new Headers({ "Content-Type": "application/json", token });
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers,
+    credentials: "same-origin",
+  });
+
   return res.json();
 }
