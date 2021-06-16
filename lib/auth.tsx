@@ -17,6 +17,8 @@ export interface UserCherryPickedI {
   name: string;
   provider: string;
   photoUrl: string;
+  // TOKEN
+  token: string;
 }
 
 export interface AuthDataI {
@@ -43,6 +45,7 @@ const useProvideAuth = () => {
       name: rawUser.displayName,
       photoUrl: rawUser.photoURL,
       provider: rawUser.providerData[0].providerId,
+      token: rawUser.xa,
     };
   };
 

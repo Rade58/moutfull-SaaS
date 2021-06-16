@@ -140,7 +140,7 @@ const Dashboard: FC = () => {
   // ARGUMENATA NAMENJENIH fetcher FUNKCIJI, KOJA JE ONA, KOAJ ACTUALY SALJE REQUEST)
   // I OVOG PUTA token JE U ARGUMENTS ARRAY, PORED URL-A
   const { data } = useSWR<SitesApiDataType>(
-    user ? ["/api/sites", user.xa] : null,
+    user ? ["/api/sites", user.token] : null,
     fetcher
   );
 
