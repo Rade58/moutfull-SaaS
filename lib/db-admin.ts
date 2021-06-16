@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase-admin";
+import { parseISO, compareDesc } from "date-fns";
 
 export interface FeedbackDataI {
   author: string;
@@ -81,4 +82,25 @@ export async function getAllSites() {
 }
 
 // SITES FOR ONLY ONE USER
-export async function getUserSites(uid: string) {}
+export async function getUserSites(uid: string) {
+  const snapshot = await db
+    .collection("sites")
+    .where("authorId", "==", uid)
+    .get();
+
+  const sites: SiteNormalizedDataI[] = [];
+
+  snapshot.forEach((doc) => {
+    const data = doc.data() as SiteDataI;
+
+    sites.push({ id: doc.id, ...data });
+  });
+
+  sites.sort((a, b) =>
+    compareDesc(parseISO(a.createdAt), parseISO(b.createdAt))
+  );
+
+  return { sites };
+
+  // SORTED BY createdAt
+}
