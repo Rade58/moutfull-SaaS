@@ -12,6 +12,7 @@
     "format:check": "prettier --ignore-path ./.gitignore --check \"./**/*.{html,json,js,ts,jsx,tsx,css}\""
   },
   "dependencies": {
+    "@chakra-ui/icons": "^1.0.13",
     "@chakra-ui/react": "^1.6.3",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",

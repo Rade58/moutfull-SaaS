@@ -17,7 +17,7 @@ import { useAuth } from "@/lib/auth";
 import Feedback from "@/components/Feedback";
 
 interface FeedbackPagePropsI {
-  initialFeedback?: FeedbackDataI[];
+  initialFeedback?: FeedbackNormalizedDataI[];
 }
 
 type paramsType = { siteId: string };
@@ -31,7 +31,7 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
   const { query } = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [allFeedback, setAllFeedback] =
-    useState<FeedbackDataI[] | undefined>(initialFeedback);
+    useState<FeedbackNormalizedDataI[] | undefined>(initialFeedback);
 
   console.log({ query });
 
@@ -55,13 +55,15 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
     createFeedback(newFeedback).then((doc) => {
       console.log({ doc });
 
+      const newFeedbackId = doc.id;
+
       if (inputRef.current?.value) {
         inputRef.current.value = "";
       }
 
       setAllFeedback((prevFeedback) => {
-        if (!prevFeedback) return [newFeedback];
-        return [...prevFeedback, newFeedback];
+        if (!prevFeedback) return [{ id: newFeedbackId, ...newFeedback }];
+        return [...prevFeedback, { id: newFeedbackId, ...newFeedback }];
       });
     });
   };
@@ -87,9 +89,10 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
         </Box>
       )}
       {allFeedback &&
-        allFeedback.map(({ author, createdAt, text }, i) => {
+        allFeedback.map(({ author, createdAt, text, id }, i) => {
           return (
             <Feedback
+              id={id}
               key={
                 `${i}${createdAt.toLocaleLowerCase()}` ||
                 new Date().getTime().toString()
@@ -106,7 +109,9 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
 // --------------------------------------------------------
 
 export const getStaticPaths: GetStaticPaths<paramsType> = async (ctx) => {
-  const { sites } = await getAllSites();
+  const { sites: data } = await getAllSites();
+
+  const sites = data ? data : [];
 
   const paths = sites.map((site: { id: string /*, ostalo */ }) => {
     return {

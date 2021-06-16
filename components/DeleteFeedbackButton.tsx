@@ -1,6 +1,7 @@
 /* eslint jsx-a11y/anchor-is-valid: 1 */
 import React, { useState, useRef } from "react";
 import type { FC } from "react";
+import { mutate } from "swr";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -10,8 +11,10 @@ import {
   AlertDialogOverlay,
   IconButton,
   Button,
-  Icon,
 } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
+
+import { deleteFeedback } from "@/lib/db";
 
 const DeleteFeedbackButton: FC<{ feedbackId: string }> = ({ feedbackId }) => {
   const [isOpen, setIsopen] = useState<boolean>(false);
@@ -21,8 +24,7 @@ const DeleteFeedbackButton: FC<{ feedbackId: string }> = ({ feedbackId }) => {
   const onClose = () => setIsopen(false);
 
   const onDelete = () => {
-    // TODO
-
+    deleteFeedback(feedbackId);
     onClose();
   };
 
@@ -30,7 +32,7 @@ const DeleteFeedbackButton: FC<{ feedbackId: string }> = ({ feedbackId }) => {
     <>
       <IconButton
         aria-label="Delete feedback"
-        icon={<Icon type="delete" />}
+        icon={<DeleteIcon />}
         variant="ghost"
         onClick={() => setIsopen(true)}
       />

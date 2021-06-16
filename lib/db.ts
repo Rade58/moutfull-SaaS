@@ -16,8 +16,10 @@ export const createUser = (uid: string, data: any) => {
 
 // CREATE FEEDBACK
 
-export const createFeedback = (data: FeedbackDataI) => {
-  return firestore.collection("feedback").add(data);
+export const createFeedback = async (data: FeedbackDataI) => {
+  const feedback = await firestore.collection("feedback").add(data);
+
+  return { ...feedback };
 };
 
 // SAVE SITE
