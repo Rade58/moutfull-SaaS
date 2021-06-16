@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { SiteNormalizedDataI } from "@/lib/db-admin";
 import { getAllSites } from "@/lib/db-admin";
+import { auth } from "@/lib/firebase-admin";
 
 export type SitesApiDataType = {
   sites?: SiteNormalizedDataI[];
@@ -12,6 +13,12 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<SitesApiDataType>
 ) => {
+  try {
+    const token = (req.headers.token as string) || "";
+
+    const {} = await auth.verifyIdToken(token);
+  } catch (error) {}
+
   const result = await getAllSites();
 
   if (result.error) {
