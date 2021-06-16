@@ -52,7 +52,14 @@ const useProvideAuth = () => {
   const handleUser = (rawUser?: any): UserCherryPickedI | false => {
     if (rawUser) {
       const user = formatUser(rawUser);
-      createUser(user.uid, user);
+
+      const { token, ...userWithoutToken } = user;
+      // KADA KREIRAMO user-A NE TREBA NAM TOKEN
+      // MI KORISTIMO TOKEN ZA AUTHENTICATION LOGIKU, ALI ON NE TRBA
+      // DA BUDE LISTED KAO FIELD KDA KREIRAMO USER-A
+      createUser(user.uid, userWithoutToken);
+      // ALI KADA SET-UJEMO USERA, POSTO TO KORISTIMO NA FRONTEND-U
+      // TAMO NAM TREBA JWT
       setUser(user);
       setIsLoading(false);
       return user;
