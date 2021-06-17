@@ -4,23 +4,34 @@ import { FunctionComponent } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 
-import { Box } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 
 import { getAllSites, getAllFeedback } from "../../lib/db-admin";
 
-interface FeedbackPagePropsI {
-  initialFeedback: any;
+import { FeedbackNormalizedDataI } from "@/lib/db-admin";
+
+interface EmbededFeedbackPagePropsI {
+  feedback: FeedbackNormalizedDataI;
 }
 
-type paramsType = { siteId: string };
+type paramsType = { site: string[] };
 
 export const getStaticPaths: GetStaticPaths<paramsType> = async (ctx) => {
   const { sites } = await getAllSites();
 
+  if (!sites) {
+    return {
+      paths: [],
+      fallback: true,
+    };
+  }
+
   const paths = sites.map((site: { id: string /*, ostalo */ }) => {
     return {
       params: {
-        siteId: site.id,
+        // KADA SU U PITNJU CATCH ALL ROUTES
+        // OVDE SE MORA OBEZBEDITI ARRAY
+        site: [site.id.toString()],
       },
     };
   });
@@ -31,21 +42,23 @@ export const getStaticPaths: GetStaticPaths<paramsType> = async (ctx) => {
   };
 };
 
-export const getStaticProps: GetStaticProps<FeedbackPagePropsI, paramsType> =
-  async (ctx) => {
-    const { params } = ctx;
+export const getStaticProps: GetStaticProps<
+  EmbededFeedbackPagePropsI,
+  paramsType
+> = async (ctx) => {
+  const { params } = ctx;
 
-    const { feedback } = await getAllFeedback(params?.siteId);
+  const { feedback } = await getAllFeedback(params?.siteId);
 
-    return {
-      props: {
-        initialFeedback: feedback,
-      },
-      revalidate: 1,
-    };
+  return {
+    props: {
+      initialFeedback: feedback,
+    },
+    revalidate: 1,
   };
+};
 
-const EmbededFeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
+const EmbededFeedbackPage: FunctionComponent<EmbededFeedbackPagePropsI> = ({
   initialFeedback,
 }) => {
   console.log({ initialFeedback });
