@@ -9,6 +9,7 @@ export interface FeedbackDataI {
   createdAt: string;
   provider: string;
   status: string;
+  route: string;
 }
 
 export interface SiteDataI {
@@ -36,12 +37,18 @@ export interface SiteNormalizedDataI extends SiteDataI {
   id: SiteDocI["id"];
 }
 
-export async function getAllFeedback(siteId?: string) {
+export async function getAllFeedback(siteId?: string, route?: string) {
   try {
-    const snapshot = await db
+    let ref = db
       .collection("feedback")
       .where("siteId", "==", siteId)
-      .get();
+      .where("status", "==", "active");
+
+    if (route) {
+      ref = ref.where("route", "==", route);
+    }
+
+    const snapshot = await ref.get();
 
     const feedback: FeedbackNormalizedDataI[] = [];
 
@@ -58,7 +65,8 @@ export async function getAllFeedback(siteId?: string) {
 
     return { feedback };
   } catch (error) {
-    return { error };
+    console.error(error);
+    return { feedback: [] };
   }
 }
 
@@ -77,7 +85,8 @@ export async function getAllSites() {
 
     return { sites };
   } catch (error) {
-    return { error };
+    console.error(error);
+    return { sites: [] };
   }
 }
 

@@ -4,19 +4,19 @@ import { FunctionComponent } from "react";
 import { Box, Heading, Text, Divider } from "@chakra-ui/react";
 import { format, parseISO } from "date-fns";
 
-import { FeedbackDataI } from "@/lib/db-admin";
+import { FeedbackDataI, FeedbackNormalizedDataI } from "@/lib/db-admin";
 
 // import DeleteFeedbackButton from "@/components/DeleteFeedbackButton";
 // import FeedbckRow from './FeedbackRow'
 
-interface FeedbackPropsI {
+/* interface FeedbackPropsI {
   id: string;
   author: FeedbackDataI["author"];
   text: FeedbackDataI["text"];
   createdAt: FeedbackDataI["createdAt"];
-}
+} */
 
-const Feedback: FunctionComponent<FeedbackPropsI> = ({
+const Feedback: FunctionComponent<FeedbackNormalizedDataI> = ({
   author,
   text,
   createdAt,

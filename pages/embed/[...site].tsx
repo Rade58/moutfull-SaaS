@@ -2,44 +2,54 @@
 /* eslint jsx-a11y/anchor-is-valid: 1 */
 import { FunctionComponent } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 
 import { Box, Text } from "@chakra-ui/react";
 
-import { getAllSites, getAllFeedback } from "../../lib/db-admin";
+import { getAllSites, getAllFeedback } from "@/lib/db-admin";
 
-import { FeedbackNormalizedDataI } from "@/lib/db-admin";
+import type { FeedbackNormalizedDataI } from "@/lib/db-admin";
+
+import Feedback from "@/components/Feedback";
 
 interface EmbededFeedbackPagePropsI {
-  feedback: FeedbackNormalizedDataI;
+  feedback: FeedbackNormalizedDataI[];
 }
 
+// TYPE-OVAO SAM OVO KAO ARRAY OD STRINGS
+// JER BI TREBALO DA IMAS ATRRAY
+// KADA SE RADI O CATCH ALL ROUTES
+// DAKLI SVAKI OD ROUTE-OVA CE BITI U ARRAY-U
+// KADA
 type paramsType = { site: string[] };
 
 export const getStaticPaths: GetStaticPaths<paramsType> = async (ctx) => {
-  const { sites } = await getAllSites();
+  try {
+    const { sites } = await getAllSites();
 
-  if (!sites) {
+    const paths = sites.map((site: { id: string /*, ostalo */ }) => {
+      return {
+        params: {
+          // KADA SU U PITNJU CATCH ALL ROUTES
+          // OVDE SE MORA OBEZBEDITI ARRAY
+          // A DAJES PARMAETAR, ONAKO KAKO TI SE ZOVE FILE
+          // [...site].tsx
+          site: [site.id.toString()],
+        },
+      };
+    });
+
+    return {
+      paths: paths,
+      fallback: true,
+    };
+  } catch (error) {
+    // throw new Error("Something went wrong with getting sites");
     return {
       paths: [],
       fallback: true,
     };
   }
-
-  const paths = sites.map((site: { id: string /*, ostalo */ }) => {
-    return {
-      params: {
-        // KADA SU U PITNJU CATCH ALL ROUTES
-        // OVDE SE MORA OBEZBEDITI ARRAY
-        site: [site.id.toString()],
-      },
-    };
-  });
-
-  return {
-    paths: paths,
-    fallback: true,
-  };
 };
 
 export const getStaticProps: GetStaticProps<
@@ -48,24 +58,53 @@ export const getStaticProps: GetStaticProps<
 > = async (ctx) => {
   const { params } = ctx;
 
-  const { feedback } = await getAllFeedback(params?.siteId);
+  if (!params || (params && !params.site)) {
+    throw new Error("params, or sites not existing");
+  }
 
-  return {
-    props: {
-      initialFeedback: feedback,
-    },
-    revalidate: 1,
-  };
+  try {
+    // KADA SU U PITANJU CATCH ALL ROUTES, TREBA DA DOBIJAS ARRAY
+    // DAKLE U ARRAY-U JE SVAKI OD
+    const [siteId, posibleRoute] = params.site;
+
+    const { feedback } = await getAllFeedback(siteId, posibleRoute);
+
+    return {
+      props: {
+        feedback,
+      },
+      revalidate: 1,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      props: {
+        feedback: [],
+      },
+      revalidate: 1,
+    };
+  }
 };
 
 const EmbededFeedbackPage: FunctionComponent<EmbededFeedbackPagePropsI> = ({
-  initialFeedback,
+  feedback,
 }) => {
-  console.log({ initialFeedback });
+  console.log({ feedback });
 
-  const { query } = useRouter();
+  // const { query } = useRouter();
 
-  return <Box>Page ID: {query.siteId}</Box>;
+  return (
+    <Box display="flex" flexDirection="column" width="full">
+      {feedback && feedback.length ? (
+        feedback.map(({ id, ...restOfOneFeedback }) => {
+          return <Feedback key={id} id={id} {...restOfOneFeedback} />;
+        })
+      ) : (
+        <Text>There are no comments for this site.</Text>
+      )}
+    </Box>
+  );
 };
 
 export default EmbededFeedbackPage;
