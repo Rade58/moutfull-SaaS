@@ -9,7 +9,6 @@ export interface FeedbackDataI {
   createdAt: string;
   provider: string;
   status: string;
-  route: string;
 }
 
 export interface SiteDataI {

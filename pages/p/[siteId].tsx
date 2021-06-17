@@ -89,17 +89,16 @@ const FeedbackPage: FunctionComponent<FeedbackPagePropsI> = ({
         </Box>
       )}
       {allFeedback &&
-        allFeedback.map(({ author, createdAt, text, id }, i) => {
+        allFeedback.map(({ id, createdAt, ...restOfOneFeedback }, i) => {
           return (
             <Feedback
               id={id}
+              createdAt={createdAt}
               key={
                 `${i}${createdAt.toLocaleLowerCase()}` ||
                 new Date().getTime().toString()
               }
-              author={author}
-              createdAt={createdAt}
-              text={text}
+              {...restOfOneFeedback}
             />
           );
         })}

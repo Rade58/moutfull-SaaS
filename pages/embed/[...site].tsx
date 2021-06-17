@@ -65,6 +65,8 @@ export const getStaticProps: GetStaticProps<
   try {
     // KADA SU U PITANJU CATCH ALL ROUTES, TREBA DA DOBIJAS ARRAY
     // DAKLE U ARRAY-U JE SVAKI OD
+    // DAKLE KOLIKO GOT CATCH ALL ROUTES
+    // SVE TE ROUTES CE BITI DEO OVOG ARRAY-A
     const [siteId, posibleRoute] = params.site;
 
     const { feedback } = await getAllFeedback(siteId, posibleRoute);
